@@ -27,6 +27,11 @@ const UpdateContactTool = CreateXeroTool(
         country: z.string().optional(),
       })
       .optional(),
+    addressType: z.enum(["POBOX", "STREET"]).describe(
+      "Which Xero address type to set. POBOX is the mailing/postal address shown on purchase orders. \
+      STREET is the physical/street address. If omitted, both POBOX and STREET are set to the same value \
+      so the address appears everywhere (including on purchase orders)."
+    ).optional(),
     defaultCurrency: z.string().describe("The default currency for the contact (e.g. USD, GBP, EUR, NZD). \
       This sets the currency used on invoices and purchase orders for this contact.").optional(),
   },
@@ -38,6 +43,7 @@ const UpdateContactTool = CreateXeroTool(
     email,
     phone,
     address,
+    addressType,
     defaultCurrency,
   }: {
     contactId: string;
@@ -52,6 +58,7 @@ const UpdateContactTool = CreateXeroTool(
       postalCode?: string;
       country?: string;
     };
+    addressType?: "POBOX" | "STREET";
     firstName?: string;
     lastName?: string;
     defaultCurrency?: string;
@@ -66,6 +73,7 @@ const UpdateContactTool = CreateXeroTool(
         phone,
         address,
         defaultCurrency,
+        addressType,
       );
       if (response.isError) {
         return {

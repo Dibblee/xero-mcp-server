@@ -13,8 +13,34 @@ async function updateContact(
   address: Address | undefined,
   contactId: string,
   defaultCurrency: string | undefined,
+  addressType: string | undefined,
 ): Promise<Contact | undefined> {
   await xeroClient.authenticate();
+
+  let addresses: Address[] | undefined;
+  if (address) {
+    const baseAddress = {
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2,
+      city: address.city,
+      country: address.country,
+      postalCode: address.postalCode,
+      region: address.region,
+    };
+
+    if (addressType === "POBOX") {
+      addresses = [{ ...baseAddress, addressType: Address.AddressTypeEnum.POBOX }];
+    } else if (addressType === "STREET") {
+      addresses = [{ ...baseAddress, addressType: Address.AddressTypeEnum.STREET }];
+    } else {
+      // Default: set both POBOX and STREET so the address appears on
+      // purchase orders (POBOX) and in the general contact view (STREET).
+      addresses = [
+        { ...baseAddress, addressType: Address.AddressTypeEnum.POBOX },
+        { ...baseAddress, addressType: Address.AddressTypeEnum.STREET },
+      ];
+    }
+  }
 
   const contact: Contact = {
     name,
@@ -30,19 +56,7 @@ async function updateContact(
           },
         ]
       : undefined,
-    addresses: address
-      ? [
-          {
-            addressType: Address.AddressTypeEnum.STREET,
-            addressLine1: address.addressLine1,
-            addressLine2: address.addressLine2,
-            city: address.city,
-            country: address.country,
-            postalCode: address.postalCode,
-            region: address.region,
-          },
-        ]
-      : undefined,
+    addresses,
   };
 
   const contacts: Contacts = {
@@ -73,6 +87,7 @@ export async function updateXeroContact(
   phone?: string,
   address?: Address,
   defaultCurrency?: string,
+  addressType?: string,
 ): Promise<XeroClientResponse<Contact>> {
   try {
     const updatedContact = await updateContact(
@@ -84,6 +99,7 @@ export async function updateXeroContact(
       address,
       contactId,
       defaultCurrency,
+      addressType,
     );
 
     if (!updatedContact) {
