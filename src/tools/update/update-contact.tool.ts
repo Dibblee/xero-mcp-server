@@ -27,6 +27,8 @@ const UpdateContactTool = CreateXeroTool(
         country: z.string().optional(),
       })
       .optional(),
+    defaultCurrency: z.string().describe("The default currency for the contact (e.g. USD, GBP, EUR, NZD). \
+      This sets the currency used on invoices and purchase orders for this contact.").optional(),
   },
   async ({
     contactId,
@@ -36,6 +38,7 @@ const UpdateContactTool = CreateXeroTool(
     email,
     phone,
     address,
+    defaultCurrency,
   }: {
     contactId: string;
     name: string;
@@ -51,6 +54,7 @@ const UpdateContactTool = CreateXeroTool(
     };
     firstName?: string;
     lastName?: string;
+    defaultCurrency?: string;
   }) => {
     try {
       const response = await updateXeroContact(
@@ -61,6 +65,7 @@ const UpdateContactTool = CreateXeroTool(
         email,
         phone,
         address,
+        defaultCurrency,
       );
       if (response.isError) {
         return {
