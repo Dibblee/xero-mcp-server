@@ -1,7 +1,7 @@
 import { xeroClient } from "../clients/xero-client.js";
 import { XeroClientResponse } from "../types/tool-response.js";
 import { formatError } from "../helpers/format-error.js";
-import { PurchaseOrder, LineItemTracking } from "xero-node";
+import { PurchaseOrder, LineItemTracking, CurrencyCode } from "xero-node";
 import { getClientHeaders } from "../helpers/get-client-headers.js";
 
 interface PurchaseOrderLineItem {
@@ -25,6 +25,7 @@ async function createPurchaseOrder(
   telephone: string | undefined,
   deliveryInstructions: string | undefined,
   purchaseOrderNumber: string | undefined,
+  currencyCode: string | undefined,
 ): Promise<PurchaseOrder | undefined> {
   await xeroClient.authenticate();
 
@@ -41,6 +42,7 @@ async function createPurchaseOrder(
     telephone: telephone,
     deliveryInstructions: deliveryInstructions,
     purchaseOrderNumber: purchaseOrderNumber,
+    currencyCode: currencyCode as CurrencyCode | undefined,
     status: PurchaseOrder.StatusEnum.DRAFT,
   };
 
@@ -71,6 +73,7 @@ export async function createXeroPurchaseOrder(
   telephone?: string,
   deliveryInstructions?: string,
   purchaseOrderNumber?: string,
+  currencyCode?: string,
 ): Promise<XeroClientResponse<PurchaseOrder>> {
   try {
     const createdPurchaseOrder = await createPurchaseOrder(
@@ -84,6 +87,7 @@ export async function createXeroPurchaseOrder(
       telephone,
       deliveryInstructions,
       purchaseOrderNumber,
+      currencyCode,
     );
 
     if (!createdPurchaseOrder) {

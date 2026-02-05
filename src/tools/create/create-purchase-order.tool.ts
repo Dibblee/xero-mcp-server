@@ -43,8 +43,10 @@ const CreatePurchaseOrderTool = CreateXeroTool(
     deliveryInstructions: z.string().describe("Instructions for delivery (500 characters max).").optional(),
     purchaseOrderNumber: z.string().describe("Unique alpha numeric code identifying purchase order. \
       Will auto-generate from Organisation Invoice Settings if not specified.").optional(),
+    currencyCode: z.string().describe("The currency code for the purchase order (e.g. USD, GBP, EUR). \
+      If not specified, the contact's default currency will be used.").optional(),
   },
-  async ({ contactId, lineItems, date, deliveryDate, reference, deliveryAddress, attentionTo, telephone, deliveryInstructions, purchaseOrderNumber }) => {
+  async ({ contactId, lineItems, date, deliveryDate, reference, deliveryAddress, attentionTo, telephone, deliveryInstructions, purchaseOrderNumber, currencyCode }) => {
     const result = await createXeroPurchaseOrder(
       contactId,
       lineItems,
@@ -56,6 +58,7 @@ const CreatePurchaseOrderTool = CreateXeroTool(
       telephone,
       deliveryInstructions,
       purchaseOrderNumber,
+      currencyCode,
     );
 
     if (result.isError) {
